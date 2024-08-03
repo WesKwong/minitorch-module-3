@@ -29,6 +29,11 @@ UserIndex: TypeAlias = Sequence[int]
 UserShape: TypeAlias = Sequence[int]
 UserStrides: TypeAlias = Sequence[int]
 
+def ensure_nparray(x: Union[Sequence[int], np.ndarray]) -> np.ndarray:
+    if isinstance(x, np.ndarray):
+        return x
+    return np.array(x)
+
 
 def index_to_position(index: Index, strides: Strides) -> int:
     """
@@ -43,7 +48,11 @@ def index_to_position(index: Index, strides: Strides) -> int:
         Position in storage
     """
 
-    raise NotImplementedError("Need to include this file from past assignment.")
+    # TODO: Implement for Task 2.1.
+    index = ensure_nparray(index)
+    strides = ensure_nparray(strides)
+    return sum(index * strides)
+    # raise NotImplementedError("Need to implement for Task 2.1")
 
 
 def to_index(ordinal: int, shape: Shape, out_index: OutIndex) -> None:
@@ -59,7 +68,11 @@ def to_index(ordinal: int, shape: Shape, out_index: OutIndex) -> None:
         out_index : return index corresponding to position.
 
     """
-    raise NotImplementedError("Need to include this file from past assignment.")
+    # TODO: Implement for Task 2.1.
+    for dim_idx, dim_size in enumerate(shape[::-1]):
+        out_index[-dim_idx-1] = ordinal % dim_size
+        ordinal //= dim_size
+    # raise NotImplementedError("Need to implement for Task 2.1")
 
 
 def broadcast_index(
@@ -81,7 +94,15 @@ def broadcast_index(
     Returns:
         None
     """
-    raise NotImplementedError("Need to include this file from past assignment.")
+    # TODO: Implement for Task 2.2.
+    small_idxs = np.arange(shape.size)
+    big_idxs = small_idxs + (big_shape.size - shape.size)
+    for small_idx, big_idx in zip(small_idxs, big_idxs):
+        if shape[small_idx] != 1:
+            out_index[small_idx] = big_index[big_idx]
+        else:
+            out_index[small_idx] = 0
+    # raise NotImplementedError("Need to implement for Task 2.2")
 
 
 def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
@@ -98,7 +119,21 @@ def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
     Raises:
         IndexingError : if cannot broadcast
     """
-    raise NotImplementedError("Need to include this file from past assignment.")
+    # TODO: Implement for Task 2.2.
+    max_len, min_len = len(shape1), len(shape2)
+    max_shape, min_shape = shape1, shape2
+    if max_len < min_len:
+        max_len, min_len = min_len, max_len
+        max_shape, min_shape = min_shape, max_shape
+    union_shape = list(max_shape)
+    union_shape[-min_len:] = min_shape
+    for i in range(max_len - min_len, max_len):
+        max_shape_i, min_shape_i = max_shape[i], union_shape[i]
+        if max_shape_i > 1 and min_shape_i > 1 and max_shape_i != min_shape_i:
+            raise IndexingError
+        union_shape[i] = max_shape_i if max_shape_i > 1 else min_shape_i
+    return tuple(union_shape)
+    # raise NotImplementedError("Need to implement for Task 2.2")
 
 
 def strides_from_shape(shape: UserShape) -> UserStrides:
@@ -209,7 +244,7 @@ class TensorData:
         Permute the dimensions of the tensor.
 
         Args:
-            *order: a permutation of the dimensions
+            order (list): a permutation of the dimensions
 
         Returns:
             New `TensorData` with the same storage and a new dimension order.
@@ -218,7 +253,11 @@ class TensorData:
             range(len(self.shape))
         ), f"Must give a position to each dimension. Shape: {self.shape} Order: {order}"
 
-        raise NotImplementedError("Need to include this file from past assignment.")
+        # TODO: Implement for Task 2.1.
+        new_shape = tuple([self.shape[idx] for idx in order])
+        new_strides = tuple([self.strides[idx] for idx in order])
+        return TensorData(self._storage, new_shape, new_strides)
+        # raise NotImplementedError("Need to implement for Task 2.1")
 
     def to_string(self) -> str:
         s = ""
