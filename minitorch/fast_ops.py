@@ -179,7 +179,7 @@ def tensor_map(
                 out_data = fn(in_data)
                 out[index_to_position(out_index, out_strides)] = out_data
 
-    return njit(parallel=True)(_map)  # type: ignore
+    return njit()(_map)  # type: ignore
 
 
 def tensor_zip(
@@ -232,7 +232,7 @@ def tensor_zip(
                 out_data = fn(a_data, b_data)
                 out[index_to_position(out_index, out_strides)] = out_data
 
-    return njit(parallel=True)(_zip)  # type: ignore
+    return njit()(_zip)  # type: ignore
 
 
 def tensor_reduce(
@@ -276,7 +276,7 @@ def tensor_reduce(
                 out_data = fn(out[i], a_data)
                 out[i] = out_data
 
-    return njit(parallel=True)(_reduce)  # type: ignore
+    return njit()(_reduce)  # type: ignore
 
 
 def _tensor_matrix_multiply(
@@ -327,4 +327,4 @@ def _tensor_matrix_multiply(
     raise NotImplementedError("Need to implement for Task 3.2")
 
 
-tensor_matrix_multiply = njit(parallel=True, fastmath=True)(_tensor_matrix_multiply)
+tensor_matrix_multiply = njit(fastmath=True)(_tensor_matrix_multiply)
