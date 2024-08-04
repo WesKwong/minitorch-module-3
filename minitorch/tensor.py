@@ -178,6 +178,9 @@ class Tensor:
     def __radd__(self, b: TensorLike) -> Tensor:
         return self + b
 
+    def __rsub__(self, b: TensorLike) -> Tensor:
+        return -self + b
+
     def __rmul__(self, b: TensorLike) -> Tensor:
         return self * b
 

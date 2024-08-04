@@ -29,11 +29,6 @@ UserIndex: TypeAlias = Sequence[int]
 UserShape: TypeAlias = Sequence[int]
 UserStrides: TypeAlias = Sequence[int]
 
-def ensure_nparray(x: Union[Sequence[int], np.ndarray]) -> np.ndarray:
-    if isinstance(x, np.ndarray):
-        return x
-    return np.array(x)
-
 
 def index_to_position(index: Index, strides: Strides) -> int:
     """
@@ -49,8 +44,6 @@ def index_to_position(index: Index, strides: Strides) -> int:
     """
 
     # TODO: Implement for Task 2.1.
-    index = ensure_nparray(index)
-    strides = ensure_nparray(strides)
     return sum(index * strides)
     # raise NotImplementedError("Need to implement for Task 2.1")
 
@@ -69,6 +62,7 @@ def to_index(ordinal: int, shape: Shape, out_index: OutIndex) -> None:
 
     """
     # TODO: Implement for Task 2.1.
+    ordinal += 0
     for dim_idx, dim_size in enumerate(shape[::-1]):
         out_index[-dim_idx-1] = ordinal % dim_size
         ordinal //= dim_size
