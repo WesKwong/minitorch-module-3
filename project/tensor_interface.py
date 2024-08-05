@@ -78,6 +78,8 @@ def st_visualize_tensor(
         st.error("Can only visualize a tensor which has 3 dimensions")
         return
 
+    highlighted_index = np.array(highlighted_index)
+    strides = np.array(strides)
     position_in_storage = index_to_position(highlighted_index, strides)
 
     if position_in_storage >= 0 and show_value:
@@ -203,7 +205,7 @@ def interface_permute(tensor: Tensor, hide_function_defs: bool):
         viz_tensor = p_tensor
     st_visualize_tensor(viz_tensor, out_index, show_value=False)
     st_visualize_storage(
-        tensor, index_to_position(out_index, viz_tensor._tensor.strides)
+        tensor, index_to_position(out_index, viz_tensor._tensor._strides)
     )
 
 

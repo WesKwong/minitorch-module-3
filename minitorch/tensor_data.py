@@ -44,8 +44,6 @@ def index_to_position(index: Index, strides: Strides) -> int:
     """
 
     # TODO: Implement for Task 2.1.
-    index = np.array(index)
-    strides = np.array(strides)
     return sum(index * strides)
     # raise NotImplementedError("Need to implement for Task 2.1")
 
