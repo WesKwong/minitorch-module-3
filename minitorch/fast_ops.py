@@ -313,15 +313,17 @@ def _tensor_matrix_multiply(
     # raise NotImplementedError("Need to implement for Task 3.2")
     for i in prange(len(out)):
         out_index = np.zeros_like(out_shape)
-        a_big_index = out_index.copy()
-        b_big_index = out_index.copy()
-        a_big_shape = out_shape.copy()
-        b_big_shape = out_shape.copy()
-        a_big_shape[-1] = a_shape[-1]
-        b_big_shape[-2] = b_shape[-2]
+        to_index(i, out_shape, out_index)
         a_index = np.zeros_like(a_shape)
         b_index = np.zeros_like(b_shape)
-        to_index(i, out_shape, out_index)
+        a_big_shape = np.zeros_like(out_shape)
+        b_big_shape = np.zeros_like(out_shape)
+        a_big_shape[-1] = a_shape[-1]
+        b_big_shape[-2] = b_shape[-2]
+        a_big_index = np.zeros_like(out_shape)
+        b_big_index = np.zeros_like(out_shape)
+        a_big_index[:] = out_index[:]
+        b_big_index[:] = out_index[:]
         out_data = 0
         for j in range(a_shape[-1]):
             a_big_index[-1] = j
