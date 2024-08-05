@@ -55,12 +55,7 @@ class FastOps(TensorOps):
         def ret(a: Tensor, b: Tensor) -> Tensor:
             c_shape = shape_broadcast(a.shape, b.shape)
             out = a.zeros(c_shape)
-            print("=================================")
-            print("out: ", out.tuple())
-            print("a:   ", a.tuple())
-            print("b:   ", b.tuple())
             f(*out.tuple(), *a.tuple(), *b.tuple())
-            print("out: ", out.tuple())
             return out
 
         return ret
@@ -324,7 +319,28 @@ def _tensor_matrix_multiply(
     b_batch_stride = b_strides[0] if b_shape[0] > 1 else 0
 
     # TODO: Implement for Task 3.2.
-    raise NotImplementedError("Need to implement for Task 3.2")
+    # raise NotImplementedError("Need to implement for Task 3.2")
+    for i in prange(len(out)):
+        out_index = np.zeros_like(out_shape)
+        a_big_index = out_index.copy()
+        b_big_index = out_index.copy()
+        a_big_shape = out_shape.copy()
+        b_big_shape = out_shape.copy()
+        a_big_shape[-1] = a_shape[-1]
+        b_big_shape[-2] = b_shape[-2]
+        a_index = np.zeros_like(a_shape)
+        b_index = np.zeros_like(b_shape)
+        to_index(i, out_shape, out_index)
+        out_data = 0
+        for j in range(a_shape[-1]):
+            a_big_index[-1] = j
+            b_big_index[-2] = j
+            broadcast_index(a_big_index, a_big_shape, a_shape, a_index)
+            broadcast_index(b_big_index, b_big_shape, b_shape, b_index)
+            a_data = a_storage[index_to_position(a_index, a_strides)]
+            b_data = b_storage[index_to_position(b_index, b_strides)]
+            out_data += a_data * b_data
+        out[index_to_position(out_index, out_strides)] = out_data
 
 
 tensor_matrix_multiply = njit(fastmath=True)(_tensor_matrix_multiply)
