@@ -44,7 +44,10 @@ def index_to_position(index: Index, strides: Strides) -> int:
     """
 
     # TODO: Implement for Task 2.1.
-    return sum(index * strides)
+    ret = 0
+    for i in range(len(index)):
+        ret += index[i] * strides[i]
+    return ret
     # raise NotImplementedError("Need to implement for Task 2.1")
 
 
@@ -89,13 +92,16 @@ def broadcast_index(
         None
     """
     # TODO: Implement for Task 2.2.
-    small_idxs = np.arange(shape.size)
-    big_idxs = small_idxs + (big_shape.size - shape.size)
-    for small_idx, big_idx in zip(small_idxs, big_idxs):
+    offset = big_shape.size - shape.size
+    small_idx = 0
+    big_idx = small_idx + offset
+    while small_idx < shape.size:
         if shape[small_idx] != 1:
             out_index[small_idx] = big_index[big_idx]
         else:
             out_index[small_idx] = 0
+        small_idx += 1
+        big_idx += 1
     # raise NotImplementedError("Need to implement for Task 2.2")
 
 
