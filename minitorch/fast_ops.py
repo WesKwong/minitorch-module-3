@@ -160,21 +160,16 @@ def tensor_map(
         in_strides: Strides,
     ) -> None:
         # TODO: Implement for Task 3.1.
-        # raise NotImplementedError("Need to implement for Task 3.1")
-        if (in_shape == out_shape).all() == 1 and (in_strides == out_strides).all() == True:
-            for i in prange(len(in_storage)):
-                out[i] = fn(in_storage[i])
-        else:
-            for i in prange(len(out)):
-                out_index = np.zeros_like(out_shape)
-                in_index = np.zeros_like(in_shape)
-                to_index(i, out_shape, out_index)
-                broadcast_index(out_index, out_shape, in_shape, in_index)
-                in_data = in_storage[index_to_position(in_index, in_strides)]
-                out_data = fn(in_data)
-                out[index_to_position(out_index, out_strides)] = out_data
+        for i in prange(len(out)):
+            out_index = np.zeros_like(out_shape)
+            in_index = np.zeros_like(in_shape)
+            to_index(i, out_shape, out_index)
+            broadcast_index(out_index, out_shape, in_shape, in_index)
+            in_data = in_storage[index_to_position(in_index, in_strides)]
+            out_data = fn(in_data)
+            out[index_to_position(out_index, out_strides)] = out_data
 
-    return njit()(_map)  # type: ignore
+    return njit(parallel=True)(_map)  # type: ignore
 
 
 def tensor_zip(
@@ -211,23 +206,19 @@ def tensor_zip(
         b_strides: Strides,
     ) -> None:
         # TODO: Implement for Task 3.1.
-        if (out_shape == a_shape).all() == 0 and (out_shape == b_shape).all() == 0 and (out_strides == a_strides).all() == 0 and (out_strides == b_strides).all() == 0:
-            for i in prange(len(out)):
-                out[i] = fn(a_storage[i], b_storage[i])
-        else:
-            for i in prange(len(out)):
-                out_index = np.zeros_like(out_shape)
-                a_index = np.zeros_like(a_shape)
-                b_index = np.zeros_like(b_shape)
-                to_index(i, out_shape, out_index)
-                broadcast_index(out_index, out_shape, a_shape, a_index)
-                broadcast_index(out_index, out_shape, b_shape, b_index)
-                a_data = a_storage[index_to_position(a_index, a_strides)]
-                b_data = b_storage[index_to_position(b_index, b_strides)]
-                out_data = fn(a_data, b_data)
-                out[index_to_position(out_index, out_strides)] = out_data
+        for i in prange(len(out)):
+            out_index = np.zeros_like(out_shape)
+            a_index = np.zeros_like(a_shape)
+            b_index = np.zeros_like(b_shape)
+            to_index(i, out_shape, out_index)
+            broadcast_index(out_index, out_shape, a_shape, a_index)
+            broadcast_index(out_index, out_shape, b_shape, b_index)
+            a_data = a_storage[index_to_position(a_index, a_strides)]
+            b_data = b_storage[index_to_position(b_index, b_strides)]
+            out_data = fn(a_data, b_data)
+            out[index_to_position(out_index, out_strides)] = out_data
 
-    return njit()(_zip)  # type: ignore
+    return njit(parallel=True)(_zip)  # type: ignore
 
 
 def tensor_reduce(
@@ -264,14 +255,14 @@ def tensor_reduce(
             out_index = np.zeros_like(out_shape)
             a_index = np.zeros_like(a_shape)
             to_index(i, out_shape, out_index)
-            broadcast_index(out_index, out_shape, a_shape, a_index)
+            a_index = out_index.copy()
             for j in range(a_shape[reduce_dim]):
                 a_index[reduce_dim] = j
                 a_data = a_storage[index_to_position(a_index, a_strides)]
                 out_data = fn(out[i], a_data)
                 out[i] = out_data
 
-    return njit()(_reduce)  # type: ignore
+    return njit(parallel=True)(_reduce)  # type: ignore
 
 
 def _tensor_matrix_multiply(
@@ -343,4 +334,4 @@ def _tensor_matrix_multiply(
         out[index_to_position(out_index, out_strides)] = out_data
 
 
-tensor_matrix_multiply = njit(fastmath=True)(_tensor_matrix_multiply)
+tensor_matrix_multiply = njit(parallel=True, fastmath=True)(_tensor_matrix_multiply)
