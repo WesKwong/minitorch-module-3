@@ -485,8 +485,6 @@ def _tensor_matrix_multiply(
         k_range = min(BLOCK_DIM, residual)
         for k in range(k_range):
             out_value += a_shared[pi, k] * b_shared[k, pj]
-            if i == 32 and j == 32:
-                print(out_value)
         offset += BLOCK_DIM
         cuda.syncthreads()
     if i < out_shape[1] and j < out_shape[2]:
